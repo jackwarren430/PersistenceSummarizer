@@ -3,21 +3,19 @@ from pdfminer.high_level import extract_text
 import io
 
 #Title & Description
-st.markdown(f"""
-    <div "padding: 0px; border-radius: 5px;">
-        <h1 style="color: #7851a9">Terms of Service Translator</h1>
+st.markdown("""
+    <div style="padding: 0px; border-radius: 5px;">
+        <h1 style="color: #7851a9; font-size: 60px;">Terms of Service Translator</h1>
         <p>Welcome to our Hackalytics submission. This project aims to summarize and highlight important sections on terms of service documents so that people actually know what they are signing up for. Simply copy and paste the terms of service into the box below and press enter!</p>
+        <hr> <!---->
     </div>
 """, unsafe_allow_html=True)
-st.write("")
-st.write("")
-
 
 #Functions
 #Makes API call to LLM with txt as input
 def mainAPICall(txt):
 	#Add code later
-	primaryOutput = ["Placeholder", "Placeholder"]
+	primaryOutput = ["Summary", "Placeholder", "Placeholder", "Placeholder"]
 	return primaryOutput
 
 #Makes API call to LLM with txt as input to return the expansion details
@@ -75,7 +73,7 @@ if(mainInput.strip() and not pdf_success):
 	st.write("")
 	st.markdown(f"""
 	    <div "padding: 0px; border-radius: 5px;">
-	        <h2 style="color: #7851a9">Terms of Service Translator</h2>
+	        <h2 style="color: #7851a9">TOS Translated</h2>
 	    </div>
 	""", unsafe_allow_html=True)
 	APIoutput = mainAPICall(mainInput) #Location of main API call
@@ -98,7 +96,7 @@ elif(pdf_success):
 	st.write("")
 	st.markdown(f"""
 	    <div "padding: 0px; border-radius: 5px;">
-	        <h2 style="color: #7851a9">Terms of Service Translator</h2>
+	        <h2 style="color: #7851a9">TOS Translated</h2>
 	    </div>
 	""", unsafe_allow_html=True)
 	APIoutput = mainAPICall(pdf_text) #Location of main API call
@@ -114,7 +112,11 @@ elif(pdf_success):
 	st.write("")
 	st.write("")
 
-
+st.markdown(f"""
+	    <div "padding: 0px; border-radius: 5px;">
+	        <hr><!---->
+	    </div>
+	""", unsafe_allow_html=True)
 st.write("Developed by Jack Warren and James Li")
 
 	
