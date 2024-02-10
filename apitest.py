@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import requests
 
 url = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
@@ -28,6 +27,3 @@ output = query({
 })
 
 print(output)
-=======
-print("Hello World")
->>>>>>> 5256d48 (message)
