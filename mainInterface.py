@@ -1,4 +1,6 @@
 import streamlit as st
+from pdfminer.high_level import extract_text
+import io
 
 #Title & Description
 st.markdown(f"""
@@ -35,7 +37,7 @@ def expansionText(sectionsArray):
 			continue
 
 		with st.expander(f"More on this ({i + 1})"):
-			expansionDetails.append(f"{i + 1}. {helperAPICall('')}")
+			expansionDetails.append(f"{i + 1}. {helperAPICall(section)}")
 			st.write(expansionDetails[i - 1])
 
 		st.write("")
@@ -44,13 +46,33 @@ def expansionText(sectionsArray):
 
 mainInput = st.text_area('Enter your terms of service here: ', '', height=500, key="text_area")
 
-st.write("")
-st.write("")
-st.write("")
-st.write("")
-st.write("")
+# Upload PDF file
+pdf_file = st.file_uploader("Or upload a PDF version here:", type=["pdf"])
+pdf_text = ""
+pdf_success = False
+if pdf_file is not None:
+    # Convert to bytes
+    bytes_data = pdf_file.getvalue()
 
-if(mainInput.strip()):
+    # Use bytes data to create a BytesIO object
+    pdf_bio = io.BytesIO(bytes_data)
+
+    # Extract text from PDF
+    try:
+        pdf_text = extract_text(pdf_bio)
+        pdf_success = True
+        #APIoutput = mainAPICall(pdf_text)
+
+    except Exception as e:
+        pdf_text = (f"An error occurred while processing the PDF file. {e}")
+        pdf_success = False
+
+if(mainInput.strip() and not pdf_success):
+	st.write("")
+	st.write("")
+	st.write("")
+	st.write("")
+	st.write("")
 	st.markdown(f"""
 	    <div "padding: 0px; border-radius: 5px;">
 	        <h2 style="color: #7851a9">Terms of Service Translator</h2>
@@ -63,12 +85,36 @@ if(mainInput.strip()):
 		st.write("The following is a summary of the Terms of Service and its notable sections: ")
 	st.write("")
 	expansionText(APIoutput)
+	st.write("")
+	st.write("")
+	st.write("")
+	st.write("")
+	st.write("")
+elif(pdf_success):
+	st.write("")
+	st.write("")
+	st.write("")
+	st.write("")
+	st.write("")
+	st.markdown(f"""
+	    <div "padding: 0px; border-radius: 5px;">
+	        <h2 style="color: #7851a9">Terms of Service Translator</h2>
+	    </div>
+	""", unsafe_allow_html=True)
+	APIoutput = mainAPICall(pdf_text) #Location of main API call
+	if(len(APIoutput) == 1):
+		st.write("The following is a summary of the Terms of Service")
+	else:
+		st.write("The following is a summary of the Terms of Service and its notable sections: ")
+	st.write("")
+	expansionText(APIoutput)
+	st.write("")
+	st.write("")
+	st.write("")
+	st.write("")
+	st.write("")
 
-st.write("")
-st.write("")
-st.write("")
-st.write("")
-st.write("")
+
 st.write("Developed by Jack Warren and James Li")
 
 	
