@@ -1,9 +1,5 @@
 from HuggingFaceApi import HuggingFaceApi as hf
 
-short_tos = """
-
-"""
-
 tos = """
 Terms of Service
 
@@ -140,49 +136,13 @@ XIX. Creative Commons
 This Terms of Service document is based on one developed by Automattic (http://wordpress.com/tos/) and is licensed under a Creative Commons Attribution-ShareAlike 2.5 License.
 """
 
-def splitStringByWords(input_string, chunk_size):
-    words = input_string.split()
-    chunks = []
-    current_chunk = []
-    current_size = 0
-
-    for word in words:
-        current_chunk.append(word)
-        current_size += 1
-        if current_size >= chunk_size:
-            chunks.append(' '.join(current_chunk))
-            current_chunk = []
-            current_size = 0
 
 
-    if current_chunk:
-        chunks.append(' '.join(current_chunk))
-
-    return chunks
-
-summary_responses = []
-analysis_responses = []
-for chunk in splitStringByWords(tos, 700):
-    summary_responses.append(hf.summarizeTOS(chunk))
-    analysis_responses.append(hf.expandOnSection({"question": "What does this section mean in Layman's terms?", "context": chunk}))
-
-
-total_summary = ""
-for response in summary_responses:
-    total_summary += response[0]["generated_text"] + " "
-
-total_analysis = ""
-#for responses in analysis_responses:
-    #total_analysis += responses
-
-print("\n")
-print(total_summary)
-print("\n")
-#print(total_analysis[0])
-print(analysis_responses[0])
-
-
-
+summary, analysis = hf.processTOS(tos)
+#summary = hf.processTOS2(tos)
+print(summary)
+for a in analysis:
+    print(f"\n-------\n{a}\n")
 
 
 
