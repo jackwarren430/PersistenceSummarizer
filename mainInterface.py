@@ -15,27 +15,23 @@ st.markdown("""
 #Makes API call to LLM with txt as input
 def mainAPICall(txt):
 	#Add code later
-	primaryOutput = ["Summary", "Placeholder", "Placeholder", "Placeholder"]
+	primaryOutput = [["Summary", ''], ["Section1", "Expansion1"], ["Section2", "Expansion2"], ["Section3", "Expansion3"]]
+	#primaryOutput.append(["New", 'lol'])
 	return primaryOutput
-
-#Makes API call to LLM with txt as input to return the expansion details
-def helperAPICall(txt):
-	#add code later
-	return "Placeholder"
 
 #Makes API call to LLM for expansion and adds expansionText to expansion box
 def expansionText(sectionsArray):
 	expansionDetails = []
 
 	for i, section in enumerate(sectionsArray):
-		st.write(section)
+		st.write(section[0])
 		if(i == 0):
 			st.write("")
 			st.write("")
 			continue
 
-		with st.expander(f"More on this ({i + 1})"):
-			expansionDetails.append(f"{i + 1}. {helperAPICall(section)}")
+		with st.expander(f"More on this section ({i})"):
+			expansionDetails.append(f"{i}. {section[1]}")
 			st.write(expansionDetails[i - 1])
 
 		st.write("")
