@@ -43,7 +43,7 @@ class HuggingFaceApi:
 
         output = query({
             "inputs": prompt,
-            #"parameters": {"do_sample": True, "max_new_tokens": max_tokens, "min_length": min_length, "max_length": max_length},
+            "parameters": {"do_sample": True, "max_new_tokens": max_tokens, "min_length": min_length, "max_length": max_length},
             #"parameters": {"max_new_tokens": 50},
             "options": {"wait_for_model": True, "use_gpu": True},
         })
@@ -82,7 +82,7 @@ class HuggingFaceApi:
 
     
     @staticmethod
-    def split_into_chunks(text, max_words=800):
+    def split_into_chunks(text, max_words=700):
         words = text.split()
         chunks = []
         current_chunk = []
@@ -109,48 +109,46 @@ class HuggingFaceApi:
         sections.append(tos[last_pos:].strip())
         processed_sections = []
         for section in sections:
-            if len(section.split()) <= 800:
+            if len(section.split()) <= 700:
                 processed_sections.append(section)
             else:
-                chunks = HuggingFaceApi.split_into_chunks(section, 800)
+                chunks = HuggingFaceApi.split_into_chunks(section, 700)
                 processed_sections.extend(chunks)
         return processed_sections
-
-    @classmethod
-    def finalOutput(cls, sum, analysis):
-        finalOut = [[sum, '']]
-        finalOut.append(analysis)
-        return finalOut
 
     @staticmethod
     def processTOS(tos):
         chunks = HuggingFaceApi.splitTOS(tos)[1:]
         summary_total = ""
-        analysis_total = [[]]
+        analysis_total = []
         for chunk in chunks:
             summary = HuggingFaceApi.makeSummaryApiCall(chunk, 100, 20, 100)
-            summary_total += f'{summary}. '
+            print("****")
+            print(summary)
+            print("****")
+            summary_total += f'{summary}\n'
             prompt = {
                 "question": "Is this section in my terms of service taking away my rights? Should I be concerned about this section of my terms of service?",
                 "context": summary,
             }
             #analysis = HuggingFaceApi.makeAnalysisApiCall(prompt, 20, 40)
-            #analysis = ''
-            analysis_total.append([summary, "Placeholder"])
+            analysis = "Placeholder"
+            duo = [summary, analysis]
+            analysis_total.append(duo)
 
-            print(f'\n----\n{summary}\n')
-        summary = HuggingFaceApi.makeSummaryApiCall(summary_total, 250, 50, 300)
-        output = HuggingFaceApi.finalOutput(summary, analysis_total)
-        return output
+        summary2 = HuggingFaceApi.makeSummaryApiCall(summary_total, 250, 50, 300)
+        analysis_total.insert(0, [summary2, ""])
+        return analysis_total
 
     def testSection(section):
         summary = HuggingFaceApi.makeSummaryApiCall(section, 100, 20, 100)
         #print(f'\n{summary}\n')
         prompt = {
-            "question": "Why should I be concerned about this clause in my Terms of Service?", #What does this section really mean and what are its implications? Expand upon this section and tell me what it is really saying?
-            "context": section,
+            "question": "Expand upon this section and tell me what it is really saying?",
+            #"question": "Why should I be concerned about this clause in my Terms of Service?", #What does this section really mean and what are its implications? Expand upon this section and tell me what it is really saying?
+            "context": section
         }
-        response = HuggingFaceApi.makeAnalysisApiCall(prompt, 15, 10, 20)
+        response = HuggingFaceApi.makeAnalysisApiCall(prompt, 50, 20, 100)
         return response
 
 

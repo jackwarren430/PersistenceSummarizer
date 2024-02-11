@@ -400,12 +400,19 @@ You promise to only provide information and content that you have the right to s
 You agree to only provide content or information that does not violate the law nor anyone’s rights (including intellectual property rights). You also agree that your profile information will be truthful. LinkedIn may be required by law to remove certain information or content in certain countries.
 """
 
-#r1, r2, r3 = hf.testSection(section2)
-#print(f'{r1}\n\n----\n\n{r2}\n\n----\n\n{r3}')
 
-#print(hf.processTOS(tos2))
 
-print(hf.testSection(section2))
+#output = hf.processTOS(tos2)
+#print(output == None)
+
+#print(f'\nTotal Summary:\n{output[0][0]}\n\n')
+#for i, analysis in enumerate(output):
+#   print(f'-----\n{analysis[0]}\n{analysis[1]}\n')
+
+test = hf.testSection(section2)
+print(test)
+
+
 
 
 
