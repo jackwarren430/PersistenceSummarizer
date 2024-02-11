@@ -22,7 +22,7 @@ def mainAPICall(txt):
 
 #Makes API call to LLM for expansion and adds expansionText to expansion box
 def expansionText(sectionsArray):
-	#expansionDetails = []
+	expansionDetails = []
 
 	for i, section in enumerate(sectionsArray):
 		st.write(section[0])
@@ -31,9 +31,9 @@ def expansionText(sectionsArray):
 			st.write("")
 			continue
 
-		#with st.expander(f"More on this section ({i})"):
-			#expansionDetails.append(f"{i}. {section[1]}")
-			#st.write(expansionDetails[i - 1])
+		with st.expander(f"More on this section ({i})"):
+			expansionDetails.append(f"{i}. {section[1]}")
+			st.write(expansionDetails[i - 1])
 
 		st.write("")
 		st.write("")
