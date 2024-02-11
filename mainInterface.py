@@ -23,12 +23,18 @@ def mainAPICall(txt):
 #Makes API call to LLM for expansion and adds expansionText to expansion box
 def expansionText(sectionsArray):
 	expansionDetails = []
+	tokenS = "Summary: \n\n"
 
 	for i, section in enumerate(sectionsArray):
-		st.write(section[0])
+		st.write(f'{tokenS}{section[0]}')
 		if(i == 0):
-			st.write("")
-			st.write("")
+			tokenS = ''
+			st.markdown(f"""
+			    <div "padding: 0px; border-radius: 5px;">
+			        <hr><!---->
+			    </div>
+				""", unsafe_allow_html=True)
+			st.write("Sections: ")
 			continue
 
 		with st.expander(f"More on this section ({i})"):
