@@ -3,9 +3,9 @@ import re
 
 class HuggingFaceApi:
 
-    tos_summarizer_legal_url = "https://api-inference.huggingface.co/models/ml6team/distilbart-tos-summarizer-tosdr"
+    tos_summarizer_url = "https://api-inference.huggingface.co/models/ml6team/distilbart-tos-summarizer-tosdr"
     summerizer_url = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
-    legal_url = "https://api-inference.huggingface.co/models/atharvamundada99/bert-large-question-answering-finetuned-legal"
+    analysis_url = "https://api-inference.huggingface.co/models/atharvamundada99/bert-large-question-answering-finetuned-legal"
     token = "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"
     
     @classmethod
@@ -23,46 +23,62 @@ class HuggingFaceApi:
             "parameters": {"do_sample": False, "max_new_tokens": max_tokens, "min_length": min_length, "max_length": max_length},
             "options": {"wait_for_model": True, "use_gpu": True},
         })
-        print(output)
-        return output[0]["generated_text"]
+        if isinstance(output, dict):
+            print("\n---\nsummary output returned an error!\n---")
+            print(output)
+            print("---")
+            return ""
+        else:
+            return output[0]["generated_text"]
 
     @classmethod
-    def makeAnalysisApiCall(cls, prompt, min_length, max_length):
+    def makeAnalysisApiCall(cls, prompt, max_tokens, min_length, max_length):
         headers = {
             'Authorization': f'Bearer {cls.token}'
         }
 
         def query(payload):
-            response = requests.post(cls.legal_url, headers=headers, json=payload)
+            response = requests.post(cls.analysis_url, headers=headers, json=payload)
             return response.json()
 
         output = query({
             "inputs": prompt,
-            "parameters": {"do_sample": True, "min_length": min_length, "max_length": max_length},
+            #"parameters": {"do_sample": True, "max_new_tokens": max_tokens, "min_length": min_length, "max_length": max_length},
             #"parameters": {"max_new_tokens": 50},
             "options": {"wait_for_model": True, "use_gpu": True},
         })
 
-        return output["answer"]
+        if 'error' in output:
+            print("\n---\nanalysis output returned an error!\n---")
+            print(output)
+            print("---")
+            return ""
+        else:
+            return output["answer"]
 
     @classmethod
-    def makeLegalApiCall(cls, prompt, min_length, max_length):
+    def makeTosSummaryApiCall(cls, prompt, max_tokens, min_length, max_length):
         headers = {
             'Authorization': f'Bearer {cls.token}'
         }
 
         def query(payload):
-            response = requests.post(cls.tos_summarizer_legal_url, headers=headers, json=payload)
+            response = requests.post(cls.tos_summarizer_url, headers=headers, json=payload)
             return response.json()
 
         output = query({
             "inputs": prompt,
-            "parameters": {"do_sample": False, "max_new_tokens": 30, "min_length": min_length, "max_length": max_length},
+            "parameters": {"do_sample": False, "max_new_tokens": max_tokens, "min_length": min_length, "max_length": max_length},
             #"parameters": {"max_new_tokens": 50},
             "options": {"wait_for_model": True, "use_gpu": True},
         })
-
-        return output[0]["generated_text"]
+        if isinstance(output, dict):
+            print("\n---\ntos summary output returned an error!\n---")
+            print(output)
+            print("---")
+            return ""
+        else:
+            return output[0]["generated_text"]
 
     
     @staticmethod
@@ -81,7 +97,7 @@ class HuggingFaceApi:
 
     @staticmethod
     def splitTOS(tos):
-        pattern = re.compile(r'(\n|^)(Section \d+|CHAPTER \d+|[IVXLCDM]+\.)', re.IGNORECASE)
+        pattern = re.compile(r'(\n|^)(Section \d+|CHAPTER \d+|[IVXLCDM]+\.|\d\d)', re.IGNORECASE)
         matches = pattern.finditer(tos)
         sections = []
         last_pos = 0
@@ -102,38 +118,34 @@ class HuggingFaceApi:
 
     @staticmethod
     def processTOS(tos):
-        chunks = HuggingFaceApi.splitTOS(tos)
+        chunks = HuggingFaceApi.splitTOS(tos)[1:]
         summary_total = ""
         analysis_total = []
         for chunk in chunks:
-            summary = HuggingFaceApi.makeSummaryApiCall(chunk, 50, 20, 50)
-            summary_total += f'{summary}.'
+            summary = HuggingFaceApi.makeSummaryApiCall(chunk, 100, 20, 100)
+            summary_total += f'{summary}. '
             prompt = {
                 "question": "Is this section in my terms of service taking away my rights? Should I be concerned about this section of my terms of service?",
                 "context": summary,
             }
-            analysis = HuggingFaceApi.makeAnalysisApiCall(prompt, 20, 40)
-            analysis_total.append(analysis)
-        summary = HuggingFaceApi.makeSummaryApiCall(summary_total, 70, 20, 50)
-        return summary_total, analysis_total
+            #analysis = HuggingFaceApi.makeAnalysisApiCall(prompt, 20, 40)
+            #analysis_total.append(analysis)
+            print(f'\n----\n{summary}\n')
+        summary = HuggingFaceApi.makeSummaryApiCall(summary_total, 250, 50, 300)
+        return summary, analysis_total
 
-    def processTOS2(tos):
-        chunks = HuggingFaceApi.splitTOS(tos)
-        total = ""
-        for chunk in chunks:
-            prompt = {
-                "question": "What is most important part of this Terms of Servics clause?",
-                "context": chunk,
-            }
-            blah = HuggingFaceApi.makeAnalysisApiCall(prompt, 20, 40)
-            print(blah)
-            total += blah
+    def testSection(section):
+        summary = HuggingFaceApi.makeSummaryApiCall(section, 100, 20, 100)
+        #print(f'\n{summary}\n')
         prompt = {
-            "question": "What are the most important aspects of this shortened Terms of Serives?",
-            "context": total,
+            "question": "Why should I be concerned about this clause in my Terms of Service?",
+            "context": section,
         }
-        answer = HuggingFaceApi.makeAnalysisApiCall(prompt, 20, 40)
-        return answer
+        response = HuggingFaceApi.makeAnalysisApiCall(prompt, 15, 10, 20)
+        return response
+
+
+
 
 
    
