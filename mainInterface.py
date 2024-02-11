@@ -1,6 +1,7 @@
 import streamlit as st
 from pdfminer.high_level import extract_text
 import io
+from HuggingFaceApi import HuggingFaceApi as hf
 
 #Title & Description
 st.markdown("""
@@ -14,14 +15,14 @@ st.markdown("""
 #Functions
 #Makes API call to LLM with txt as input
 def mainAPICall(txt):
-	#Add code later
-	primaryOutput = [["Summary", ''], ["Section1", "Expansion1"], ["Section2", "Expansion2"], ["Section3", "Expansion3"]]
+	primaryOutput = hf.processTOS(txt)
 	#primaryOutput.append(["New", 'lol'])
+	#primaryOutput = [["Summary", ''], ["Section1", "Expansion1"], ["Section2", "Expansion2"], ["Section3", "Expansion3"]]
 	return primaryOutput
 
 #Makes API call to LLM for expansion and adds expansionText to expansion box
 def expansionText(sectionsArray):
-	expansionDetails = []
+	#expansionDetails = []
 
 	for i, section in enumerate(sectionsArray):
 		st.write(section[0])
@@ -30,9 +31,9 @@ def expansionText(sectionsArray):
 			st.write("")
 			continue
 
-		with st.expander(f"More on this section ({i})"):
-			expansionDetails.append(f"{i}. {section[1]}")
-			st.write(expansionDetails[i - 1])
+		#with st.expander(f"More on this section ({i})"):
+			#expansionDetails.append(f"{i}. {section[1]}")
+			#st.write(expansionDetails[i - 1])
 
 		st.write("")
 		st.write("")

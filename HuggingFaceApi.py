@@ -116,11 +116,17 @@ class HuggingFaceApi:
                 processed_sections.extend(chunks)
         return processed_sections
 
+    @classmethod
+    def finalOutput(cls, sum, analysis):
+        finalOut = [[sum, '']]
+        finalOut.append(analysis)
+        return finalOut
+
     @staticmethod
     def processTOS(tos):
         chunks = HuggingFaceApi.splitTOS(tos)[1:]
         summary_total = ""
-        analysis_total = []
+        analysis_total = [[]]
         for chunk in chunks:
             summary = HuggingFaceApi.makeSummaryApiCall(chunk, 100, 20, 100)
             summary_total += f'{summary}. '
@@ -129,23 +135,26 @@ class HuggingFaceApi:
                 "context": summary,
             }
             #analysis = HuggingFaceApi.makeAnalysisApiCall(prompt, 20, 40)
-            #analysis_total.append(analysis)
+            #analysis = ''
+            analysis_total.append([summary, "Placeholder"])
+
             print(f'\n----\n{summary}\n')
         summary = HuggingFaceApi.makeSummaryApiCall(summary_total, 250, 50, 300)
-        return summary, analysis_total
+        output = HuggingFaceApi.finalOutput(summary, analysis_total)
+        return output
 
     def testSection(section):
         summary = HuggingFaceApi.makeSummaryApiCall(section, 100, 20, 100)
         #print(f'\n{summary}\n')
         prompt = {
-            "question": "Why should I be concerned about this clause in my Terms of Service?",
+            "question": "Why should I be concerned about this clause in my Terms of Service?", #What does this section really mean and what are its implications? Expand upon this section and tell me what it is really saying?
             "context": section,
         }
         response = HuggingFaceApi.makeAnalysisApiCall(prompt, 15, 10, 20)
         return response
 
 
-
+    
 
 
    
