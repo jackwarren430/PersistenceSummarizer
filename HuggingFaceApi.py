@@ -45,7 +45,6 @@ class HuggingFaceApi:
         output = query({
             "inputs": prompt,
             "parameters": {"do_sample": True, "max_new_tokens": max_tokens, "min_length": min_length, "max_length": max_length},
-            #"parameters": {"max_new_tokens": 50},
             "options": {"wait_for_model": True, "use_gpu": True},
         })
         if 'error' in output:
@@ -97,24 +96,26 @@ class HuggingFaceApi:
         summary_total = ""
         analysis_total = []
         for chunk in chunks:
-            summary = HuggingFaceApi.makeSummaryApiCall(chunk, 100, 20, 100)
+            summary = HuggingFaceApi.makeSummaryApiCall(chunk, 250, 20, 500)
             summary_total += f'{summary}\n'
             question = "Explain why this Terms of Service clause is important:"
             prompt = f"{question}\n\n{chunk}"
-            analysis = HuggingFaceApi.makeAnalysisApiCall(prompt, 100, 20, 200)
+            analysis = HuggingFaceApi.makeAnalysisApiCall(prompt, 250, 20, 500)
             duo = [summary, analysis]
             analysis_total.append(duo)
 
-        summary2 = HuggingFaceApi.makeSummaryApiCall(summary_total, 250, 50, 300)
+        summary2 = HuggingFaceApi.makeSummaryApiCall(summary_total, 250, 20, 500)
         analysis_total.insert(0, [summary2, ""])
         return analysis_total
 
     def testSection(section):
-        print(f'{HuggingFaceApi.makeSummaryApiCall(section, 100, 20, 100)}\n-----\n')
+        summary = HuggingFaceApi.makeSummaryApiCall(section, 250, 20, 500)
         question = "Explain why this Terms of Service clause is important:"
         prompt = f"{question}\n\n{section}"
-        response = HuggingFaceApi.makeAnalysisApiCall(prompt, 80, 20, 200)
-        return response
+        responseF = HuggingFaceApi.makeAnalysisApiCall(section, 250, 20, 500)
+        responseS = HuggingFaceApi.makeAnalysisApiCall(summary, 250, 20, 500)
+        print(f'Summary:\n{summary}\n\n*****\nTranslation with full section:\n\n{responseF}\n*****\nTranslation with summary:\n\n{responseS}')
+        return responseF
 
 
     
