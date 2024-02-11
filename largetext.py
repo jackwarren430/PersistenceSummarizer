@@ -402,15 +402,12 @@ You agree to only provide content or information that does not violate the law n
 
 
 
-#output = hf.processTOS(tos2)
-#print(output == None)
+output = hf.processTOS(tos2)
+for i, analysis in enumerate(output):
+   print(f'-----\n{analysis[0]}\n***\n{analysis[1]}\n-----')
 
-#print(f'\nTotal Summary:\n{output[0][0]}\n\n')
-#for i, analysis in enumerate(output):
-#   print(f'-----\n{analysis[0]}\n{analysis[1]}\n')
-
-test = hf.testSection(section2)
-print(test)
+#test = hf.testSection(section2)
+#print(test)
 
 
 
