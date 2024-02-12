@@ -79,7 +79,7 @@ pandas==2.1.4
 partd==1.4.1
 passlib==1.7.4
 pdfminer.six
-pdfminer
+pdfminer==20191125
 Pillow==9.3.0
 platformdirs==4.0.0
 pooch==1.8.0
